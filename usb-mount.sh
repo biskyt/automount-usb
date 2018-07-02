@@ -9,6 +9,8 @@
 # This script is called from systemd unit file to mount or unmount
 # a USB drive.
 
+MOUNTBASE="/mnt"
+
 PATH="$PATH:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/bin:/sbin"
 log="logger -t usb-mount.sh -s "
 
@@ -17,6 +19,7 @@ usage()
     ${log} "Usage: $0 {add|remove} device_name (e.g. sdb1)"
     exit 1
 }
+
 
 if [[ $# -ne 2 ]]; then
     usage
@@ -43,7 +46,7 @@ do_mount()
 
     # Figure out a mount point to use
     LABEL=${ID_FS_LABEL}
-    if grep -q " /media/${LABEL} " /etc/mtab; then
+    if grep -q " ${MOUNTBASE}/${LABEL} " /etc/mtab; then
         # Already in use, make a unique one
         LABEL+="-${DEVBASE}"
     fi
@@ -54,7 +57,7 @@ do_mount()
         DEV_LABEL="${DEVBASE}"
     fi
 
-    MOUNT_POINT="/media/${DEV_LABEL}"
+    MOUNT_POINT="${MOUNTBASE}/${DEV_LABEL}"
 
     ${log} "Mount point: ${MOUNT_POINT}"
 
